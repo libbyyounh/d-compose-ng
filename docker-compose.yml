@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # 只定义 Nginx 反向代理服务
+  nginx:
+    image: nginx:latest
+    container_name: my_nginx_proxy
+    # extra_hosts 确保在所有环境下都能解析 host.docker.internal
+    # 对于较新的 Docker 版本通常不是必须的，但加上可以提高兼容性
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - app-network
+# 声明 app-network 是一个外部已存在的网络
+networks:
+  app-network:
+    external: true
+    # !!! 重要：请将下面的 name 替换为您第一步找到的实际网络名 !!!
+    name: app-network
